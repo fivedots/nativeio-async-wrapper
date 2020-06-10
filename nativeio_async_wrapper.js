@@ -4,13 +4,12 @@ mergeInto(LibraryManager.library, {
     // each open.
     lastFileDescriptor: 100,
 
-    // Associates a fileDescriptor (a number) with a FileHandle. This file
-    // handle is the object obtained from calling NativeIO.open and may be
-    // expanded with new fields (e.g. seek_position).
+    // Associates a file descriptor (a number) with a FileHandle. This file
+    // handle is the object obtained from calling NativeIO.open.
     fileDescriptorToFileHandle: {},
 
-    // Opens a NativeIO file and returns a (promise-wrapped) number that acts
-    // as an ID for the FileHandle.
+    // Opens a NativeIO file and returns a (promise-wrapped) file descriptor
+    // that acts as an ID for the FileHandle.
     open: function(name) {
       return nativeIO.open(name).then((fileHandle) => {
         var fd = ++NativeIOWrapper.lastFileDescriptor;
@@ -19,8 +18,8 @@ mergeInto(LibraryManager.library, {
       });
     },
 
-    // Deletes a NativeIO file, removing it's name from the fileset. All
-    // existing file handles must be closed before calling delete.
+    // Deletes a NativeIO file, removing it's name from the fileset. The file
+    // cannot be open.
     delete: function(name) {
       return nativeIO.delete(name);
     },
@@ -47,7 +46,7 @@ mergeInto(LibraryManager.library, {
                                                                    offset);
     },
 
-    // Closes the NativeIO file associated with the fd file descriptor.
+    // Closes the NativeIO file associated with the file descriptor.
     close: function(fd) {
       return NativeIOWrapper.fileDescriptorToFileHandle[fd].close().then(() => {
         delete NativeIOWrapper.fileDescriptorToFileHandle[fd];
@@ -118,7 +117,6 @@ mergeInto(LibraryManager.library, {
 
   NativeIO_Read__deps: ['$NativeIOWrapper', '$Asyncify'],
   NativeIO_Read: function(fileDescriptor, buffer_ptr, length, offset) {
-    //TODO get buffer off heap
     return Asyncify.handleSleep(function(wakeUp) {
       var buffer = Module.HEAP8.subarray(buffer_ptr, buffer_ptr + length);
       NativeIOWrapper.read(fileDescriptor, buffer, offset).then(
@@ -134,7 +132,6 @@ mergeInto(LibraryManager.library, {
 
   NativeIO_Write__deps: ['$NativeIOWrapper', '$Asyncify'],
   NativeIO_Write: function(fileDescriptor, buffer_ptr, length, offset) {
-    //TODO
     return Asyncify.handleSleep(function(wakeUp) {
       var buffer = Module.HEAP8.subarray(buffer_ptr, buffer_ptr + length);
       NativeIOWrapper.write(fileDescriptor, buffer, offset).then(
