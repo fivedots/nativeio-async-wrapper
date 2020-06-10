@@ -20,7 +20,7 @@ emcc --js-library ./nativeio_async_wrapper.js \
 
 > NOTE: USE_PTHREADS=1 is used to ensure that the Wasm module is instantiated
 > with a SharedArrayMemory as the backing structure of the memory. This is
-> required (for now) by the read/write calls
+> required (for now) by the read/write calls.
 
 To see the result run:
 
