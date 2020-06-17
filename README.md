@@ -4,7 +4,7 @@ This repo contains a JS wrapper (nativeio_async_wrapper.js) for NativeIO. The
 wrapper uses Asyncify to expose synchronous functions out of asynchronous
 NativeIO functions.
 
-Also included in a C++ example (wrapped.cpp) that shows how to import and use
+Also included is a C++ example (wrapped.cpp) that shows how to import and use
 the wrapper.
 
 ## How To
