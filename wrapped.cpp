@@ -9,8 +9,8 @@ extern "C" {
   extern char** NativeIO_GetAll(int* resultLength);
 
   //File handle calls
-  extern int NativeIO_Read(int fileDescriptor, void* buffer, int bufferLength, int offset);
-  extern int NativeIO_Write(int fileDescriptor, void* buffer, int bufferLength, int offset);
+  extern int NativeIO_Read(int fileDescriptor, void* buffer, int bufferLength, unsigned long long int offset);
+  extern int NativeIO_Write(int fileDescriptor, void* buffer, int bufferLength, unsigned long long int offset);
   extern int NativeIO_Close(int fileDescriptor);
 }
 
