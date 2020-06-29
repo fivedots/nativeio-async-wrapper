@@ -54,6 +54,21 @@ mergeInto(LibraryManager.library, {
     },
   },
 
+  $NativeIOUtils: {
+    combineI64Params: function(param_low, param_high) {
+      var HIGH_OFFSET = 0x100000000; // 2^32
+      // use an unsigned operator on low and shift high by 32-bits
+      var param = param_high * HIGH_OFFSET + (param_low >>> 0);
+
+      var DOUBLE_LIMIT = 0x20000000000000; // 2^53
+      // we also check for equality since DOUBLE_LIMIT + 1 == DOUBLE_LIMIT
+      if (param <= -DOUBLE_LIMIT || param >= DOUBLE_LIMIT) {
+        throw 'parameter is out of valid range';
+      }
+      return param;
+    },
+  },
+
   NativeIO_Open__deps: ['$NativeIOWrapper', '$Asyncify'],
   NativeIO_Open: function(name_ptr) {
     var name = UTF8ToString(name_ptr);
@@ -115,9 +130,19 @@ mergeInto(LibraryManager.library, {
     })
   },
 
-  NativeIO_Read__deps: ['$NativeIOWrapper', '$Asyncify'],
-  NativeIO_Read: function(fileDescriptor, buffer_ptr, length, offset) {
+  NativeIO_Read__deps: ['$NativeIOWrapper', '$NativeIOUtils', '$Asyncify'],
+  NativeIO_Read: function(fileDescriptor, buffer_ptr, length, {{{ defineI64Param('offset') }}}) {
     return Asyncify.handleSleep(function(wakeUp) {
+      {{{ receiveI64ParamAsI32s('offset') }}}
+      try {
+        var offset = NativeIOUtils.combineI64Params(offset_low, offset_high);
+      } catch (error) {
+        console.log(
+          'NativeIO error receiving offset to read from file with file descriptor number',
+           fileDescriptor + ':', error);
+        wakeUp(-{{{cDefine('EINVAL')}}})
+      }
+
       var buffer = Module.HEAP8.subarray(buffer_ptr, buffer_ptr + length);
       NativeIOWrapper.read(fileDescriptor, buffer, offset).then(
         (bytes_read) => {wakeUp(bytes_read)},
@@ -130,9 +155,19 @@ mergeInto(LibraryManager.library, {
     })
   },
 
-  NativeIO_Write__deps: ['$NativeIOWrapper', '$Asyncify'],
-  NativeIO_Write: function(fileDescriptor, buffer_ptr, length, offset) {
+  NativeIO_Write__deps: ['$NativeIOWrapper','$NativeIOUtils', '$Asyncify'],
+  NativeIO_Write: function(fileDescriptor, buffer_ptr, length, {{{ defineI64Param('offset') }}}) {
     return Asyncify.handleSleep(function(wakeUp) {
+      {{{ receiveI64ParamAsI32s('offset') }}}
+      try {
+        var offset = NativeIOUtils.combineI64Params(offset_low, offset_high);
+      } catch (error) {
+        console.log(
+          'NativeIO error receiving offset to write to file with file descriptor number',
+           fileDescriptor + ':', error);
+        wakeUp(-{{{cDefine('EINVAL')}}})
+      }
+
       var buffer = Module.HEAP8.subarray(buffer_ptr, buffer_ptr + length);
       NativeIOWrapper.write(fileDescriptor, buffer, offset).then(
         (bytes_written) => {wakeUp(bytes_written)},
