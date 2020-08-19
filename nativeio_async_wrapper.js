@@ -46,6 +46,18 @@ mergeInto(LibraryManager.library, {
                                                                    offset);
     },
 
+    // Sets the size of fd to length bytes. If the new length is smaller than
+    // the current one, bytes are removed starting from the end of the file.
+    // Otherwise the file is extended with zero-valued bytes.
+    setLength: function(fd, length) {
+      return NativeIOWrapper.fileDescriptorToFileHandle[fd].setLength(length);
+    },
+
+    // Returns the length of fd in bytes.
+    getLength: function(fd) {
+      return NativeIOWrapper.fileDescriptorToFileHandle[fd].getLength();
+    },
+
     // Closes the NativeIO file associated with the file descriptor.
     close: function(fd) {
       return NativeIOWrapper.fileDescriptorToFileHandle[fd].close().then(() => {
@@ -76,7 +88,7 @@ mergeInto(LibraryManager.library, {
       NativeIOWrapper.open(name).then(
         (fd) => {wakeUp(fd)},
         (error) => {
-          console.log('NativeIO error while opening \"', name, '\": ', error);
+          console.log('NativeIO error while opening \"'+ name + '\": ', error);
           wakeUp(-{{{cDefine('EINVAL')}}})
         })
     })
@@ -175,6 +187,45 @@ mergeInto(LibraryManager.library, {
           console.log(
             'NativeIO error writing to file with file descriptor number',
             fileDescriptor + ', at offset', offset + ':', error);
+          wakeUp(-{{{cDefine('EINVAL')}}})
+        })
+    })
+  },
+
+  NativeIO_SetLength__deps: ['$NativeIOWrapper','$NativeIOUtils', '$Asyncify'],
+  NativeIO_SetLength: function(fileDescriptor, {{{ defineI64Param('length') }}}) {
+    return Asyncify.handleSleep(function(wakeUp) {
+      {{{ receiveI64ParamAsI32s('length') }}}
+      try {
+        var length = NativeIOUtils.combineI64Params(length_low, length_high);
+      } catch (error) {
+        console.log(
+          'NativeIO error receiving length to truncate file with file descriptor number',
+           fileDescriptor + ':', error);
+        wakeUp(-{{{cDefine('EINVAL')}}});
+      }
+
+      NativeIOWrapper.setLength(fileDescriptor, length).then(
+        () => {wakeUp(0)},
+        (error) => {
+          console.log(
+            'NativeIO error while setting length of file with file descriptor number',
+            fileDescriptor, 'to', offset + ':', error);
+          wakeUp(-{{{cDefine('EINVAL')}}});
+        })
+    })
+  },
+
+  NativeIO_GetLength__deps: ['$NativeIOWrapper','$NativeIOUtils', '$Asyncify'],
+  NativeIO_GetLength: function(fileDescriptor) {
+    return Asyncify.handleSleep(function(wakeUp) {
+      NativeIOWrapper.getLength(fileDescriptor).then(
+        (length) => {
+          wakeUp(length)},
+        (error) => {
+          console.log(
+            'NativeIO error while getting length of file with file descriptor number',
+            fileDescriptor + ':', error);
           wakeUp(-{{{cDefine('EINVAL')}}})
         })
     })
