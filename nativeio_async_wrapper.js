@@ -88,7 +88,7 @@ mergeInto(LibraryManager.library, {
       NativeIOWrapper.open(name).then(
         (fd) => {wakeUp(fd)},
         (error) => {
-          console.log('NativeIO error while opening \"'+ name + '\": ', error);
+          console.log(`NativeIO error while opening "${name}":`, error);
           wakeUp(-{{{cDefine('EINVAL')}}})
         })
     })
@@ -101,7 +101,7 @@ mergeInto(LibraryManager.library, {
       NativeIOWrapper.delete(name).then(
         () => {wakeUp(0)},
         (error) => {
-          console.log('NativeIO error while deleting \"', name, '\": ', error);
+          console.log(`NativeIO error while deleting "${name}":`, error);
           wakeUp(-{{{cDefine('EINVAL')}}})
         })
     })
@@ -150,8 +150,7 @@ mergeInto(LibraryManager.library, {
         var offset = NativeIOUtils.combineI64Params(offset_low, offset_high);
       } catch (error) {
         console.log(
-          'NativeIO error receiving offset to read from file with file descriptor number',
-           fileDescriptor + ':', error);
+          `NativeIO error receiving offset to read from file with file descriptor number ${fileDescriptor}:`, error);
         wakeUp(-{{{cDefine('EINVAL')}}})
       }
 
@@ -160,8 +159,7 @@ mergeInto(LibraryManager.library, {
         (bytes_read) => {wakeUp(bytes_read)},
         (error) => {
           console.log(
-            'NativeIO error reading from file with file descriptor number',
-            fileDescriptor + ', at offset', offset + ':', error);
+            `NativeIO error reading from file with file descriptor number ${fileDescriptor} at offset ${offset}:`, error);
           wakeUp(-{{{cDefine('EINVAL')}}})
         })
     })
@@ -175,8 +173,7 @@ mergeInto(LibraryManager.library, {
         var offset = NativeIOUtils.combineI64Params(offset_low, offset_high);
       } catch (error) {
         console.log(
-          'NativeIO error receiving offset to write to file with file descriptor number',
-           fileDescriptor + ':', error);
+          `NativeIO error receiving offset to write to file with file descriptor number ${fileDescriptor}:`, error);
         wakeUp(-{{{cDefine('EINVAL')}}})
       }
 
@@ -185,8 +182,7 @@ mergeInto(LibraryManager.library, {
         (bytes_written) => {wakeUp(bytes_written)},
         (error) => {
           console.log(
-            'NativeIO error writing to file with file descriptor number',
-            fileDescriptor + ', at offset', offset + ':', error);
+            `NativeIO error writing to file with file descriptor number ${fileDescriptor} at offset ${offset}:`, error);
           wakeUp(-{{{cDefine('EINVAL')}}})
         })
     })
@@ -200,8 +196,7 @@ mergeInto(LibraryManager.library, {
         var length = NativeIOUtils.combineI64Params(length_low, length_high);
       } catch (error) {
         console.log(
-          'NativeIO error receiving length to truncate file with file descriptor number',
-           fileDescriptor + ':', error);
+          `NativeIO error receiving length to truncate file with file descriptor number ${fileDescriptor}:`, error);
         wakeUp(-{{{cDefine('EINVAL')}}});
       }
 
@@ -209,8 +204,7 @@ mergeInto(LibraryManager.library, {
         () => {wakeUp(0)},
         (error) => {
           console.log(
-            'NativeIO error while setting length of file with file descriptor number',
-            fileDescriptor, 'to', offset + ':', error);
+            `NativeIO error while setting length of file with file descriptor number ${fileDescriptor} to ${length}:`, error);
           wakeUp(-{{{cDefine('EINVAL')}}});
         })
     })
@@ -220,12 +214,10 @@ mergeInto(LibraryManager.library, {
   NativeIO_GetLength: function(fileDescriptor) {
     return Asyncify.handleSleep(function(wakeUp) {
       NativeIOWrapper.getLength(fileDescriptor).then(
-        (length) => {
-          wakeUp(length)},
+        (length) => {wakeUp(length)},
         (error) => {
           console.log(
-            'NativeIO error while getting length of file with file descriptor number',
-            fileDescriptor + ':', error);
+            `NativeIO error while getting length of file with file descriptor number ${fileDescriptor} :`, error);
           wakeUp(-{{{cDefine('EINVAL')}}})
         })
     })
@@ -237,7 +229,7 @@ mergeInto(LibraryManager.library, {
       NativeIOWrapper.close(fileDescriptor).then(
         () => {wakeUp(0)},
         (error) => {
-          console.log('NativeIO error closing file with file descriptor number', fileDescriptor, ': ', error);
+          console.log(`NativeIO error closing file with file descriptor number ${fileDescriptor}:`, error);
           wakeUp(-{{{cDefine('EINVAL')}}})
         })
     })
