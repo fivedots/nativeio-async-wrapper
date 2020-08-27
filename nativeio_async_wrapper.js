@@ -58,6 +58,11 @@ mergeInto(LibraryManager.library, {
       return NativeIOWrapper.fileDescriptorToFileHandle[fd].getLength();
     },
 
+    // Flushes changes on the fd onto disk.
+    flush: function(fd) {
+      return NativeIOWrapper.fileDescriptorToFileHandle[fd].flush();
+    },
+
     // Closes the NativeIO file associated with the file descriptor.
     close: function(fd) {
       return NativeIOWrapper.fileDescriptorToFileHandle[fd].close().then(() => {
@@ -224,6 +229,19 @@ mergeInto(LibraryManager.library, {
         (error) => {
           console.log(
             `NativeIO error while getting length of file with file descriptor number ${fileDescriptor} :`, error);
+          wakeUp(-{{{cDefine('EINVAL')}}})
+        })
+    })
+  },
+
+  NativeIO_Flush__deps: ['$NativeIOWrapper','$NativeIOUtils', '$Asyncify'],
+  NativeIO_Flush: function(fileDescriptor) {
+    return Asyncify.handleSleep(function(wakeUp) {
+      NativeIOWrapper.flush(fileDescriptor).then(
+        () => {wakeUp(0)},
+        (error) => {
+          console.log(
+            `NativeIO error while flushing file with file descriptor number ${fileDescriptor} :`, error);
           wakeUp(-{{{cDefine('EINVAL')}}})
         })
     })
