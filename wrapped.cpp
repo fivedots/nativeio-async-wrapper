@@ -11,6 +11,10 @@ extern "C" {
   //File handle calls
   extern int NativeIO_Read(int fileDescriptor, void* buffer, int bufferLength, unsigned long long int offset);
   extern int NativeIO_Write(int fileDescriptor, void* buffer, int bufferLength, unsigned long long int offset);
+  extern int NativeIO_SetLength(int fileDescriptor, unsigned long long int length);
+  // We have to set the return type to double, since thats how bigger numbers
+  // (>= 2**32) are received from JS
+  extern double NativeIO_GetLength(int fileDescriptor);
   extern int NativeIO_Close(int fileDescriptor);
 }
 
@@ -34,6 +38,12 @@ int main() {
   for(int i = 0; i < 6; i++) {
     EM_ASM({console.log("\t", $0)}, read_buffer[i]);
   }
+
+  EM_ASM({console.log("Setting length of file to 5")});
+  ret = NativeIO_SetLength(f, 5);
+  EM_ASM({console.log("SetLength returned", $0 )}, ret);
+  double length  = NativeIO_GetLength(f);
+  EM_ASM({console.log("Got new length of file:", $0)}, length);
 
   ret = NativeIO_Close(f);
   EM_ASM({console.log("Close returned", $0 )}, ret);
