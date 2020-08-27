@@ -67,6 +67,12 @@ mergeInto(LibraryManager.library, {
   },
 
   $NativeIOUtils: {
+    // Utility function that combines two 32 bit integers that represent the
+    // high and low bytes of a 64 bit integer into a full range JS number. The
+    // function throws if the resulting combination would be out of range (i.e.
+    // when the result is >= 2^53 or <= -2^53). This is useful when relying on
+    // the defineI64Param Emscripten macro to receive 64 bit integer parameters
+    // from ported applications.
     combineI64Params: function(param_low, param_high) {
       var HIGH_OFFSET = 0x100000000; // 2^32
       // use an unsigned operator on low and shift high by 32-bits
