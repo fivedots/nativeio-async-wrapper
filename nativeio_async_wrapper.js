@@ -58,7 +58,7 @@ mergeInto(LibraryManager.library, {
       return NativeIOWrapper.fileDescriptorToFileHandle[fd].getLength();
     },
 
-    // Flushes changes on the fd onto disk.
+    // Flushes changes on the fd to the disk.
     flush: function(fd) {
       return NativeIOWrapper.fileDescriptorToFileHandle[fd].flush();
     },

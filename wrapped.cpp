@@ -47,7 +47,7 @@ int main() {
   EM_ASM({console.log("Got new length of file:", $0)}, length);
 
   NativeIO_Flush(f);
-  EM_ASM({console.log("Flushed file descriptor"});
+  EM_ASM({console.log("Flushed file"});
 
   ret = NativeIO_Close(f);
   EM_ASM({console.log("Close returned", $0 )}, ret);
