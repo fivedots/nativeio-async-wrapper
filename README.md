@@ -1,11 +1,14 @@
-# NativeIO Async Wrapper
+# Storage Foundation API Async Wrapper
 
-This repo contains a JS wrapper (nativeio_async_wrapper.js) for NativeIO. The
-wrapper uses Asyncify to expose synchronous functions out of asynchronous
-NativeIO functions.
+This repo contains a JS wrapper (nativeio_async_wrapper.js) for Storage
+Foundation API. The wrapper uses Asyncify to expose synchronous functions out of
+asynchronous Storage Foundation API functions.
 
 Also included is a C++ example (wrapped.cpp) that shows how to import and use
 the wrapper.
+
+Note: Storage Foundation API used to be called NativeIO. Some references to this
+name still remain, they will be removed after the new name has landed on Chrome.
 
 ## How To
 
